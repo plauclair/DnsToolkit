@@ -10,11 +10,12 @@ DNS Toolkit requires PHP’s Intl  extension as it converts international domain
 
 ### $dns->isValidHost($host, $type)
 
-Checks if a domain IP has a DNS record for a record type. Can be fed an email address to check if its domain is valid.
+Checks if a domain or IP has a DNS record for a record type. Can be fed an email address to check if its domain is valid.
 
 #### Parameters
 
 string $host : Any string, but should be a host name, IP or email to get valid results.
+
 string $type : Valid values are MX (default), A, NS, SOA, PTR, CNAME, AAAA, A6, SRV, NAPTR, TXT, ANY.
 
 #### Returns
@@ -23,7 +24,9 @@ True if the host is valid, false if not.
 
 ### $dns->isSpam($string)
 
-Checks if a domain or IP is in the Spamhaus database. Make sure your server can resolve the host, some DNS like the Google Public DNS server might not resolve to Spamhaus, giving erroneous results.
+Checks if a domain or IP is in the Spamhaus database. 
+
+**Important**: Make sure your server can resolve the host, some DNS like the Google Public DNS might not resolve to Spamhaus, giving erroneous results.
 
 #### Parameters
 
@@ -32,7 +35,9 @@ string $string : Can take any string, but preferably an URL, an email address, a
 #### Returns
 
 True if the host is Spamhaus listed.
+
 False if it's not.
+
 Null if the host is invalid.
 
 ## Versions
