@@ -1,6 +1,6 @@
 # DNS Toolkit module documentation
 
-Gives easy access to DNS checking functions, including Spamhaus checker.
+DNS Toolkit is a ProcessWire module that gives easy access to DNS checking functions, including Spamhaus checker.
 
 To use its functions, use either `$dns->function()` or `wire("dns")->function()`.
 
