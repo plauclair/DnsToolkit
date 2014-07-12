@@ -26,7 +26,7 @@ True if the host is valid, false if not.
 
 Checks if a domain or IP is in the Spamhaus database. 
 
-**Important**: Make sure your server can resolve the host, some DNS like the Google Public DNS might not resolve to Spamhaus, giving erroneous results.
+**Important**: Make sure your server can resolve Spamhaus, some DNS like the Google Public DNS might not resolve to Spamhaus, giving erroneous results. A good working alternative is OpenDNS.
 
 #### Parameters
 
