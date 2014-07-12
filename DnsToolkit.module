@@ -1,0 +1,89 @@
+<?php
+
+class DnsToolkit extends WireData implements Module {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'DNS Toolkit',
+			'version' => 100,
+			'summary' => "Gives easy access to DNS checking functions, including Spamhaus checker.",
+			'url' => 'https://github.com/plauclair/DnsToolkit',
+			'autoload' => true,
+		);
+	}
+
+	public function init() {
+		$this->setFuel("dns", $this);
+	}
+
+	/**
+	 * Checks if a domain (or an email's domain) or IP has
+	 * a DNS record for a record type (A, MX, NS, etc.)
+	 *
+	 * @param string $host Any string, but should be a
+	 * 	host name, IP or email to get valid results
+	 * @param string $type Valid values : MX (default), A, NS, SOA,
+	 * 	PTR, CNAME, AAAA, A6, SRV, NAPTR, TXT, ANY
+	 * @return true|false True if valid, false if not
+	 */
+
+	public function isValidHost($host, $type = "MX") {
+		if (filter_var($host, FILTER_VALIDATE_EMAIL)) {
+			$host = substr(strrchr($host, "@"), 1);
+		}
+		return checkdnsrr(idn_to_ascii($host), $type);
+	}
+
+	/**
+	 * Checks if a domain or ip is in the Spamhaus database.
+	 * Make sure your server can resolve the host, some DNS
+	 * like the Google Public DNS server might not resolve
+	 * to Spamhaus, giving erroneous results.
+	 *
+	 * @param string $string Can take any string, but preferably
+	 * 	an URL, an email address, a host or IP. They don't need
+	 * 	to be valid, the function will take care of this
+	 * @return true|false|null Returns true if the host is Spamhaus
+	 * 	listed, false if it's not, and null if the host is invalid
+	 */
+
+	public function isSpam($string) {
+		// parse the string to see if it's a valid url
+		$parsed_string = parse_url($string);
+		// use dbl.spamhaus.org unless we have an ip
+		$service = "dbl";
+
+		// if it's an email, get the domain
+		if (filter_var($parsed_string["path"], FILTER_VALIDATE_EMAIL)) {
+			$parsed_string = (string) substr(strrchr($parsed_string["path"], "@"), 1);
+		// is it only an ip passed in ?
+		} elseif (filter_var($parsed_string["path"], FILTER_VALIDATE_IP)) {
+			$parsed_string = (string) $parsed_string["path"];
+			$service = "zen";
+		} elseif (array_key_exists("host",$parsed_string)) {
+			// else get the host of a valid url
+			$parsed_string = (string) $parsed_string["host"];
+			// if it's an IP, switch service to zen ip checker
+			if (filter_var($parsed_string, FILTER_VALIDATE_IP)) {
+				$service = "zen";
+			}
+		} else {
+			//it could be any anything but isValidHost() will take care of things later
+			$parsed_string = (string) $parsed_string["path"];
+		}
+
+		//if the domain or ip has a valid DNS
+		if ($this->isValidHost($parsed_string,"ANY")) {
+			idn_to_ascii($parsed_string);
+			$record = dns_get_record("$parsed_string.$service.spamhaus.org.", DNS_A);
+			/* If the resulting array is empty, the domain is clear for liftoff */
+			if ($record !== NULL && count($record) == 0) {
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return null;
+		}
+	}
+}
