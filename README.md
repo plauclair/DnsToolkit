@@ -1,39 +1,45 @@
-# Field Generator module documentation
-Field Generator is a ProcessWire module to help you create random character strings and automatically assign them to one or multiple fields of your choice when a page is created.
+# DNS Toolkit module documentation
 
-When setup, it will automatically do so whether you create a page through the administration panel or through code, meaning you don’t need to set $page-\>name or any other field of your choice, it just works automagically.
+Gives easy access to DNS checking functions, including Spamhaus checker.
 
-Field Generator uses PHP’s openssl\_random\_pseudo\_bytes() function to generate its random strings. It thus has both PHP \>= 5.3.0 and OpenSSL as dependencies.
+To use its functions, use either `$dns->function()` or `wire("dns")->function()`.
 
-## Usage
+DNS Toolkit requires PHP’s Intl  extension as it converts international domain names to ascii, which would otherwise give errors. 
 
-After installation, add rules through Setup \> Field Generator. That’s it! Rules **only** run when first creating the page.
+## Available functions
 
-## Rule settings
+### $dns->isValidHost($host, $type)
 
-**Parent ID** specifies which immediate page parent the rule will be applied on.
+Checks if a domain IP has a DNS record for a record type. Can be fed an email address to check if its domain is valid.
 
-**Template** specifies what template the rule applies on.
+#### Parameters
 
-You can mix both _Parent ID_ and _Template_ to use them as a combination. Rules will apply only if the two conditions are met.
+string $host : Any string, but should be a host name, IP or email to get valid results.
+string $type : Valid values are MX (default), A, NS, SOA, PTR, CNAME, AAAA, A6, SRV, NAPTR, TXT, ANY.
 
-**Field** specifies what field will be generated.
+#### Returns
 
-**Length** sets the generated string length.
+True if the host is valid, false if not.
 
-**Dictionary** contains the characters the rule can use. It can be any character, but make sure the specified field supports them.
+### $dns->isSpam($string)
 
-## About rule conflicts
+Checks if a domain or IP is in the Spamhaus database. Make sure your server can resolve the host, some DNS like the Google Public DNS server might not resolve to Spamhaus, giving erroneous results.
 
-Field Generator makes no effort to find conflicting rules. If two different rules happen to apply on any given field, both will run. We trust you on that one.
+#### Parameters
 
-**Versions**
+string $string : Can take any string, but preferably an URL, an email address, a host or IP. The host in those don't need to be valid, the function will take care of making sure it is.
 
-0.9.0 - Adds language fields support.
+#### Returns
 
-0.8.0 - Initial release version, with Setup panel support.
+True if the host is Spamhaus listed.
+False if it's not.
+Null if the host is invalid.
 
-**License**
+## Versions
+
+1.0.0 - Initial commit
+
+## License
 
 The MIT License (MIT)
 
